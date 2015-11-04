@@ -41,8 +41,12 @@ def containers_index():
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers?state=running | python -mjson.tool
 
     """
-
-    resp = ''
+    if request.args.get('state') =='running':
+        output = docker('ps')
+    else:
+        output = docker('ps', '-a')
+        
+    resp = json.dumps(docker_ps_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['GET'])
@@ -52,8 +56,9 @@ def images_index():
     
     Complete the code below generating a valid response. 
     """
+    output = docker('images')
     
-    resp = ''
+    resp = json.dumps(docker_images_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers/<id>', methods=['GET'])
@@ -62,8 +67,8 @@ def containers_show(id):
     Inspect specific container
 
     """
-
-    resp = ''
+    output= docker('ps', '|grep', id)
+    resp = json.dumps(docker_ps_to_array(output))
 
     return Response(response=resp, mimetype="application/json")
 
@@ -73,6 +78,8 @@ def containers_log(id):
     Dump specific container logs
 
     """
+    output = docker('logs', 'id')
+    
     resp = ''
     return Response(response=resp, mimetype="application/json")
 
