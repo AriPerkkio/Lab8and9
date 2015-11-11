@@ -39,8 +39,10 @@ def containers_index():
  
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers | python -mjson.tool
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers?state=running | python -mjson.tool
-
+    
+    curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/containers | python -mjson.tool
     """
+
     if request.args.get('state') =='running':
         output = docker('ps')
     else:
@@ -55,6 +57,7 @@ def images_index():
     List all images 
     
     Complete the code below generating a valid response. 
+    curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/images | python -mjson.tool
     """
     output = docker('images')
     
