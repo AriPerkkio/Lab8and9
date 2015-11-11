@@ -67,8 +67,8 @@ def containers_show(id):
     Inspect specific container
 
     """
-    output= docker('ps', '|grep', id)
-    resp = json.dumps(docker_ps_to_array(output))
+    output= docker('inspect ', id)
+    resp = json.dumps(docker_inspect_to_array(output))
 
     return Response(response=resp, mimetype="application/json")
 
@@ -78,9 +78,9 @@ def containers_log(id):
     Dump specific container logs
 
     """
-    output = docker('logs', 'id')
+    output = docker('logs ', id)
     
-    resp = ''
+    resp = json.dumps(docker_logs_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 
@@ -89,7 +89,7 @@ def images_remove(id):
     """
     Delete a specific image
     """
-    docker ('rmi', id)
+    docker ('rmi ', id)
     resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
@@ -99,7 +99,8 @@ def containers_remove(id):
     Delete a specific container - must be already stopped/killed
 
     """
-    resp = ''
+    docker ('rm', id)
+    resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers', methods=['DELETE'])
@@ -108,7 +109,8 @@ def containers_remove_all():
     Force remove all containers - dangrous!
 
     """
-    resp = ''
+    output = docker ("rm `docker ps -a -q`")
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['DELETE'])
@@ -117,8 +119,9 @@ def images_remove_all():
     Force remove all images - dangrous!
 
     """
+    output = docker("rmi 'docker images -q'")
  
-    resp = ''
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 
