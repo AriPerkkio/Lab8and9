@@ -70,8 +70,8 @@ def containers_show(id):
     Inspect specific container
 
     """
-    output= docker('inspect ', id)
-    resp = json.dumps(output)
+    output= docker('inspect', id)
+    resp = output
 
     return Response(response=resp, mimetype="application/json")
 
