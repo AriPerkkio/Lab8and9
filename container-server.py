@@ -68,7 +68,7 @@ def containers_show(id):
 
     """
     output= docker('inspect ', id)
-    resp = json.dumps(docker_inspect_to_array(output))
+    resp = json.dumps(output)
 
     return Response(response=resp, mimetype="application/json")
 
@@ -80,7 +80,7 @@ def containers_log(id):
     """
     output = docker('logs ', id)
     
-    resp = json.dumps(docker_logs_to_array(output))
+    resp = json.dumps(output)
     return Response(response=resp, mimetype="application/json")
 
 
