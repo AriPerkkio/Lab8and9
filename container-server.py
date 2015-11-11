@@ -79,7 +79,7 @@ def containers_show(id):
 def containers_log(id):
     """
     Dump specific container logs
-
+    GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64/logs
     """
     output = docker('logs', id)
     
@@ -91,8 +91,9 @@ def containers_log(id):
 def images_remove(id):
     """
     Delete a specific image
+    curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/images/00f5f7a7a2bd
     """
-    docker ('rmi ', id)
+    docker ('rmi', id)
     resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
@@ -100,7 +101,7 @@ def images_remove(id):
 def containers_remove(id):
     """
     Delete a specific container - must be already stopped/killed
-
+    curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64
     """
     docker ('rm', id)
     resp = '{"id": "%s"}' % id
@@ -110,9 +111,11 @@ def containers_remove(id):
 def containers_remove_all():
     """
     Force remove all containers - dangrous!
+    docker ps -a -q output is: <contId> <contId> <contId>
+    with removing: docker rmi -f <contId> <contId>... 
 
     """
-    output = docker ("rm `docker ps -a -q`")
+    output = docker('rm', '-f', docker('ps','-a','-q'))
     resp = output
     return Response(response=resp, mimetype="application/json")
 
@@ -120,6 +123,7 @@ def containers_remove_all():
 def images_remove_all():
     """
     Force remove all images - dangrous!
+
 
     """
     output = docker("rmi 'docker images -q'")
