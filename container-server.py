@@ -203,7 +203,7 @@ def images_update(id):
     except:
         pass
 
-    resp = '{"id": "%s", "tag": "%s"' % id tag
+    resp = '{"id": , "tag": "%s"' % tag
     return Response(response=resp, mimetype="application/json")
 
 
