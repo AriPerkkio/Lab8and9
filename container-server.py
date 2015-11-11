@@ -68,7 +68,7 @@ def images_index():
 def containers_show(id):
     """
     Inspect specific container
-
+    curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64
     """
     output= docker('inspect', id)
     resp = output
@@ -81,7 +81,7 @@ def containers_log(id):
     Dump specific container logs
 
     """
-    output = docker('logs ', id)
+    output = docker('logs', id)
     
     resp = json.dumps(output)
     return Response(response=resp, mimetype="application/json")
