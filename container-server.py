@@ -125,9 +125,9 @@ def images_remove_all():
     Force remove all images - dangrous!
     docker images -q output is: <ID> <ID>...
     with remove: docker rmi <ID> <ID>
-
+    curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/images
     """
-    output = docker('rmi', '-f', docker('images', '-q'))
+    output = docker('rmi', '-f', docker('images', '-a', '-q'))
  
     resp = output
     return Response(response=resp, mimetype="application/json")
