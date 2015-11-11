@@ -113,7 +113,7 @@ def containers_remove_all():
     Force remove all containers - dangrous!
     docker ps -a -q output is: <contId> <contId> <contId>
     with removing: docker rmi -f <contId> <contId>... 
-
+    curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/containers
     """
     output = docker('rm', '-f', docker('ps','-a','-q'))
     resp = output
@@ -123,10 +123,11 @@ def containers_remove_all():
 def images_remove_all():
     """
     Force remove all images - dangrous!
-
+    docker images -q output is: <ID> <ID>...
+    with remove: docker rmi <ID> <ID>
 
     """
-    output = docker("rmi 'docker images -q'")
+    output = docker('rmi', '-f', docker('images', '-q'))
  
     resp = output
     return Response(response=resp, mimetype="application/json")
