@@ -1,0 +1,25 @@
+echo "Server runs at 52.18.184.96:8080"
+echo "List all containers"
+curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/containers | python -mjson.tool
+echo "List all running containers"
+curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/containers?state=running | python -mjson.tool
+echo "Inspect container d3c6c1892d64"
+curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64
+echo "Delete container d3c6c1892d64"
+curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64
+echo "Delete all containers"
+curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/containers
+echo "Create container from image lab6copy"
+curl -X POST -H 'Content-Type: application/json' 52.18.184.96:8080/containers -d' {"image": "lab6copy"}'
+echo "Restart container"
+curl -s -X PATCH -H 'Accept: application/json' 52.18.184.96:8080/containers/fa4a34fd9afe -d '{"state": "running"}'
+echo "Stop container"
+curl -s -X PATCH -H 'Accept: application/json' 52.18.184.96:8080/containers/fa4a34fd9afe -d '{"state": "stopped"}'
+echo "Show logs of container"
+GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64/logs
+echo "List all images"
+curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/images | python -mjson.tool
+echo "Delete image"
+curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/images/00f5f7a7a2bd
+echo "Delete all images"
+curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/images
