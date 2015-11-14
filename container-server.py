@@ -142,13 +142,23 @@ def containers_create():
     curl -X POST -H 'Content-Type: application/json' http://localhost:8080/containers -d '{"image": "b14752a6590e"}'
     curl -X POST -H 'Content-Type: application/json' http://localhost:8080/containers -d '{"image": "b14752a6590e","publish":"8081:22"}'
 
+    curl -X POST -H 'Content-Type: application/json' 52.18.184.96:8080/containers -d' {"image": "fb434121fc77", "publish": "8089:22"}'
+    curl -X POST -H 'Content-Type: application/json' 52.18.184.96:8080/containers -d' {"image": "lab6copy"}'
     """
+
     body = request.get_json(force=True)
     image = body['image']
-    args = ('run', '-d')
-    id = docker(*(args + (image,)))[0:12]
-    return Response(response='{"id": "%s"}' % id, mimetype="application/json")
-
+    docker('create', image)
+    
+    if 'publish' in body:
+        ports = body['publish']
+        args = ('run', '-d', '-p', ports)
+        id = docker(*(args + (image,)))[0:12]
+        return Response(response='{"id": "%s", "publish": "%s"}' % (id, ports), mimetype="application/json")
+    else:
+        args = ('run', '-d')
+        id = docker(*(args + (image,)))[0:12]
+        return Response(response='{"id": "%s"}' % id, mimetype="application/json")
 
 @app.route('/images', methods=['POST'])
 def images_create():
@@ -159,8 +169,10 @@ def images_create():
 
     """
     dockerfile = request.files['file']
+
+    output = docker('build', '-f', dockerfile, '.')
     
-    resp = ''
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 
@@ -173,6 +185,7 @@ def containers_update(id):
 
     curl -X PATCH -H 'Content-Type: application/json' http://localhost:8080/containers/b6cd8ea512c8 -d '{"state": "running"}'
     curl -X PATCH -H 'Content-Type: application/json' http://localhost:8080/containers/b6cd8ea512c8 -d '{"state": "stopped"}'
+    curl -s -X PATCH -H 'Accept: application/json' 52.18.184.96:8080/containers/fa4a34fd9afe -d '{"state": "stopped"}'
 
     """
     body = request.get_json(force=True)
@@ -194,7 +207,7 @@ def images_update(id):
     Update image attributes (support: name[:tag])  tag name should be lowercase only
 
     curl -s -X PATCH -H 'Content-Type: application/json' http://localhost:8080/images/7f2619ed1768 -d '{"tag": "test:1.0"}'
-
+    curl -s -X PATCH 'Content-Type: application/json' 52.18.184.96:8080/images/00f5f7a7a2bd -d '{"tag": "tagging_test"}'
     """
     body = request.get_json(force=True)
     try:
@@ -203,7 +216,7 @@ def images_update(id):
     except:
         pass
 
-    resp = '{"id": , "tag": "%s"' % tag
+    resp = '{"id": "%s", "tag": "%s"' % (id, tag)
     return Response(response=resp, mimetype="application/json")
 
 
