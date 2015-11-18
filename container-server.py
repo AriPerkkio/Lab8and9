@@ -71,7 +71,7 @@ def containers_show(id):
     curl -s -X GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64
     """
     output= docker('inspect', id)
-    resp = output
+    resp = docker_logs_to_object(id, output)
 
     return Response(response=resp, mimetype="application/json")
 
@@ -79,7 +79,7 @@ def containers_show(id):
 def containers_log(id):
     """
     Dump specific container logs
-    GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64/logs
+    GET -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64/logs | python -mjson.tool
     """
     output = docker('logs', id)
     
@@ -103,7 +103,7 @@ def containers_remove(id):
     Delete a specific container - must be already stopped/killed
     curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/containers/d3c6c1892d64
     """
-    docker ('rm', id)
+    docker ('rm', '-f', id)
     resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
@@ -115,8 +115,9 @@ def containers_remove_all():
     with removing: docker rmi -f <contId> <contId>... 
     curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/containers
     """
-    output = docker('rm', '-f', docker('ps','-a','-q'))
-    resp = output
+    os.system("docker rm -f $(docker ps -a -q)")
+    
+    resp = 'Removed all containers'
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['DELETE'])
@@ -127,9 +128,9 @@ def images_remove_all():
     with remove: docker rmi <ID> <ID>
     curl -s -X DELETE -H 'Accept: application/json' 52.18.184.96:8080/images
     """
-    output = docker('rmi', '-f', docker('images', '-a', '-q'))
- 
-    resp = output
+
+    os.system("docker rmi -f $(docker images -aq)")
+    resp = 'Removed all images'
     return Response(response=resp, mimetype="application/json")
 
 
@@ -165,7 +166,8 @@ def images_create():
     """
     Create image (from uploaded Dockerfile)
 
-    curl -H 'Accept: application/json' -F file=@Dockerfile http://localhost:8080/images
+    curl -H 'Accept: application/json' -F file=Dockerfile http://localhost:8080/images
+    curl -H 'Accept: application/json' -F file=Dockerfile 52.18.184.96:8080/images
 
     """
     dockerfile = request.files['file']
